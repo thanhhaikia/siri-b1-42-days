@@ -75,6 +75,8 @@ test('a file with the wrong shape is rejected and leaves progress untouched', ()
     '{"days":{},"srs":{},"dates":null}',
     '{"days":[],"srs":{}}',
     '{"days":{"1":true},"srs":{}}',
+    '{"days":{"1":{"practice":{"score":"<img src=x onerror=alert(1)>","total":16}}},"srs":{}}',
+    '{"days":{"1":{"vocab":"<b>x</b>"}},"srs":{}}',
     '{"days":{},"srs":{"u03-0":{"box":9,"due":1}}}',
     '{"days":{},"srs":{"u03-0":{"box":1}}}',
     '{"days":{},"srs":{},"reviews":{"1-3":5}}',

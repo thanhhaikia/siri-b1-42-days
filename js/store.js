@@ -28,7 +28,7 @@ export function clean(s) {
   if (!isObj(s)) return null;
   const { days, reviews = {}, srs, dates = [] } = s;
   if (![days, reviews, srs].every(isObj) || !Array.isArray(dates)) return null;
-  if (!Object.values(days).every(isObj)) return null;
+  if (!Object.values(days).every((d) => isObj(d) && Object.values(d).every((v) => v === true || isResult(v)))) return null;
   if (!Object.values(reviews).every(isResult)) return null;
   if (!Object.values(srs).every((e) => isObj(e) && INTERVALS[e.box] !== undefined && Number.isFinite(e.due))) return null;
   if (!dates.every(Number.isInteger)) return null;
