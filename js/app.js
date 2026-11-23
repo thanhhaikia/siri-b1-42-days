@@ -60,7 +60,7 @@ function home() {
     <p class="muted">Tiến độ chỉ lưu trên trình duyệt này. Xuất file để sao lưu hoặc chuyển sang máy khác.</p>
     <div class="row">
       <button type="button" class="btn" id="exp">Xuất tiến độ</button>
-      <label class="btn">Nhập tiến độ<input type="file" id="imp" accept="application/json" hidden></label>
+      <button type="button" class="btn" id="impBtn">Nhập tiến độ</button><input type="file" id="imp" accept="application/json" hidden>
       <button type="button" class="btn danger" id="reset">Xóa tiến độ</button>
     </div>
   </section>`;
@@ -70,6 +70,7 @@ function home() {
     a.download = 'siri-b1-tien-do.json';
     a.click();
   };
+  app.querySelector('#impBtn').onclick = () => app.querySelector('#imp').click();
   app.querySelector('#imp').onchange = async (e) => {
     try { store.import(await e.target.files[0].text()); route(); } catch { alert('File không hợp lệ.'); }
   };
