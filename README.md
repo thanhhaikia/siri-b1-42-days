@@ -13,6 +13,7 @@ Nội dung tự soạn theo thứ tự chủ điểm của sách Destination B1 
 
 ```bash
 npm start   # http://localhost:8080
+HOST=0.0.0.0 npm start   # mở cho máy khác trong mạng nội bộ (mặc định chỉ nghe trên 127.0.0.1)
 npm test
 ```
 
