@@ -41,9 +41,10 @@ try {
 } catch { /* no storage: keep progress in memory */ }
 
 // Another tab saved or cleared progress: adopt it so this tab's next save does not overwrite it.
+// Events can arrive late (after this tab's own save), so read what is stored now, not e.newValue.
 globalThis.addEventListener?.('storage', (e) => {
   if (e.key !== null && e.key !== KEY) return;
-  try { state = clean(JSON.parse(e.newValue)) || blank(); } catch { state = blank(); }
+  try { state = clean(JSON.parse(localStorage.getItem(KEY))) || blank(); } catch { state = blank(); }
 });
 
 function save() {

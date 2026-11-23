@@ -97,17 +97,34 @@ test('a file with only days and srs still imports', () => {
   assert.deepEqual(store.state, { days: { 2: { vocab: true } }, reviews: {}, srs: {}, dates: [] });
 });
 
+const KEY = 'sirib1.v1';
+const otherTabSaves = (json) => {
+  const event = { key: KEY, newValue: json };
+  if (json === null) mem.delete(KEY); else mem.set(KEY, json);
+  return event;
+};
+
 test('progress saved by another tab is adopted instead of overwritten', () => {
   store.reset();
   store.setTask(1, 'vocab');
   const other = JSON.parse(store.export());
   other.days[2] = { vocab: true };
-  listeners.storage({ key: 'sirib1.v1', newValue: JSON.stringify(other) });
+  listeners.storage(otherTabSaves(JSON.stringify(other)));
   store.setTask(3, 'vocab');
-  assert.deepEqual(Object.keys(JSON.parse(globalThis.localStorage.getItem('sirib1.v1')).days), ['1', '2', '3']);
+  assert.deepEqual(Object.keys(JSON.parse(mem.get(KEY)).days), ['1', '2', '3']);
 
   listeners.storage({ key: 'another.app', newValue: '{}' });
   assert.equal(Object.keys(store.state.days).length, 3);
-  listeners.storage({ key: 'sirib1.v1', newValue: null });
+  listeners.storage(otherTabSaves(null));
   assert.deepEqual(store.state.days, {});
+});
+
+test('a storage event delivered after a reset does not bring the deleted progress back', () => {
+  store.reset();
+  store.setTask(1, 'vocab');
+  const late = otherTabSaves(JSON.stringify({ days: { 1: { vocab: true }, 2: { vocab: true } }, srs: {} }));
+  store.reset();
+  listeners.storage(late);
+  store.setTask(5, 'vocab');
+  assert.deepEqual(Object.keys(JSON.parse(mem.get(KEY)).days), ['5']);
 });
