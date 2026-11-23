@@ -20,9 +20,24 @@ export function streak(dates, today) {
 }
 
 const blank = () => ({ days: {}, reviews: {}, srs: {}, dates: [] });
+const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v);
+const isResult = (v) => isObj(v) && Number.isFinite(v.score) && Number.isFinite(v.total);
+
+// Returns saved progress reduced to its known fields, or null when the shape is wrong.
+export function clean(s) {
+  if (!isObj(s)) return null;
+  const { days, reviews = {}, srs, dates = [] } = s;
+  if (![days, reviews, srs].every(isObj) || !Array.isArray(dates)) return null;
+  if (!Object.values(days).every(isObj)) return null;
+  if (!Object.values(reviews).every(isResult)) return null;
+  if (!Object.values(srs).every((e) => isObj(e) && INTERVALS[e.box] !== undefined && Number.isFinite(e.due))) return null;
+  if (!dates.every(Number.isInteger)) return null;
+  return { days, reviews, srs, dates };
+}
+
 let state = blank();
 try {
-  state = { ...blank(), ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+  state = clean(JSON.parse(localStorage.getItem(KEY) || 'null')) || blank();
 } catch { /* no storage: keep progress in memory */ }
 
 function save() {
@@ -68,9 +83,9 @@ export const store = {
   streak() { return streak(state.dates, dayNumber()); },
   export() { return JSON.stringify(state); },
   import(json) {
-    const s = JSON.parse(json);
-    if (!s || typeof s !== 'object' || !s.days || !s.srs) throw new Error('bad file');
-    state = { ...blank(), ...s };
+    const s = clean(JSON.parse(json));
+    if (!s) throw new Error('bad file');
+    state = s;
     save();
   },
   reset() { state = blank(); save(); },

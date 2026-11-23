@@ -83,6 +83,9 @@ export function reviewsFor(ci) {
   return out.map((r) => ({ ...r, id: `${r.from}-${r.to}` }));
 }
 
+export const findReview = (id) =>
+  CLUSTERS.flatMap((c) => reviewsFor(c.index)).find((r) => r.id === id);
+
 export function shuffle(arr, rnd = Math.random) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {

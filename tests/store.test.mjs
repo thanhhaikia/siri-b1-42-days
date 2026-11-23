@@ -64,3 +64,31 @@ test('export and import round-trip, bad files are rejected', () => {
   assert.throws(() => store.import('not json'));
   assert.equal(JSON.parse(mem.get('sirib1.v1')).days[2].theory, true);
 });
+
+test('a file with the wrong shape is rejected and leaves progress untouched', () => {
+  store.reset();
+  store.setTask(1, 'vocab');
+  store.learnWords(['u03-0']);
+  const before = store.export();
+  for (const bad of [
+    '{"days":{},"srs":{},"dates":{}}',
+    '{"days":{},"srs":{},"dates":null}',
+    '{"days":[],"srs":{}}',
+    '{"days":{"1":true},"srs":{}}',
+    '{"days":{},"srs":{"u03-0":{"box":9,"due":1}}}',
+    '{"days":{},"srs":{"u03-0":{"box":1}}}',
+    '{"days":{},"srs":{},"reviews":{"1-3":5}}',
+    '{"days":{},"srs":{},"dates":["today"]}',
+    'null',
+    '[]',
+  ]) {
+    assert.throws(() => store.import(bad), bad);
+    assert.equal(store.export(), before, bad);
+  }
+  assert.equal(globalThis.localStorage.getItem('sirib1.v1'), before);
+});
+
+test('a file with only days and srs still imports', () => {
+  store.import('{"days":{"2":{"vocab":true}},"srs":{}}');
+  assert.deepEqual(store.state, { days: { 2: { vocab: true } }, reviews: {}, srs: {}, dates: [] });
+});

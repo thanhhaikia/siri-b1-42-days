@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   CLUSTERS, ALL_WORDS, TOTAL_DAYS, WORDS_PER_DAY, parseQ, parseWord, getDay, reviewsFor,
-  buildReview, vocabQ, normalize, isCorrect,
+  buildReview, findReview, vocabQ, normalize, isCorrect,
 } from '../js/data.js';
 
 test('parseQ reads multiple choice and gap lines', () => {
@@ -100,4 +100,11 @@ test('normalize and isCorrect forgive case, spacing and curly quotes', () => {
   assert.equal(normalize('  Didn’t   GO. '), "didn't go");
   assert.ok(isCorrect({ a: ["didn't go", 'did not go'] }, 'Did not go'));
   assert.ok(!isCorrect({ a: ['went'] }, 'goed'));
+});
+
+test('findReview only knows the reviews listed on the schedule', () => {
+  assert.equal(findReview('1-3').label, 'Ôn tập Day 1–3');
+  assert.equal(findReview('1-21').from, 1);
+  assert.equal(findReview('22-42').to, 42);
+  for (const id of ['1.5-3', '2-3', '3-1', '1-43', 'abc', '']) assert.equal(findReview(id), undefined, id);
 });

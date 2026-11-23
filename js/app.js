@@ -1,4 +1,4 @@
-import { ALL_WORDS, CLUSTERS, TOTAL_DAYS, buildReview, getDay, reviewsFor, shuffle, vocabQ } from './data.js';
+import { ALL_WORDS, CLUSTERS, TOTAL_DAYS, buildReview, findReview, getDay, reviewsFor, shuffle, vocabQ } from './data.js';
 import { store } from './store.js';
 import { canSpeak, speak } from './speech.js';
 import { runQuiz } from './quiz.js';
@@ -161,7 +161,7 @@ function theoryView(n) {
     ${all ? g.parts.map(partHtml).join('') : partHtml(g.parts[i], i)}
     <div class="row between">
       ${all ? '<span></span>' : `<button type="button" class="btn" id="prev" ${i ? '' : 'disabled'}>← Phần trước</button>`}
-      ${all || last ? `<button type="button" class="btn primary" id="finish">Xong lý thuyết, vào luyện tập →</button>` : `<button type="button" class="btn dark" id="next" ${answered.has(i) ? '' : 'disabled'}>Phần sau →</button>`}
+      ${all || last ? `<button type="button" class="btn primary" id="finish" ${answered.size === total ? '' : 'disabled'}>Xong lý thuyết, vào luyện tập →</button>` : `<button type="button" class="btn dark" id="next" ${answered.has(i) ? '' : 'disabled'}>Phần sau →</button>`}
     </div>`;
     app.querySelector('#all').onclick = () => { all = !all; render(); };
     app.querySelector('#prev')?.addEventListener('click', () => { i--; render(); window.scrollTo(0, 0); });
@@ -183,6 +183,8 @@ function theoryView(n) {
         answered.add(k);
         const nx = app.querySelector('#next');
         if (nx && k === i) nx.disabled = false;
+        const fin = app.querySelector('#finish');
+        if (fin) fin.disabled = answered.size < g.parts.length;
       });
     });
   }
@@ -215,12 +217,12 @@ function practiceView(n) {
 }
 
 function reviewView(id) {
-  const [from, to] = id.split('-').map(Number);
-  if (!(from >= 1 && to <= TOTAL_DAYS && from < to)) return home();
+  const review = findReview(id);
+  if (!review) return home();
   runQuiz(app, {
-    title: reviewsFor(Math.floor((to - 1) / 3)).find((r) => r.id === id)?.label || `Ôn tập Day ${from}–${to}`,
+    title: review.label,
     backHref: '#/',
-    items: buildReview(from, to),
+    items: buildReview(review.from, review.to),
     again: () => reviewView(id),
     onDone: (r) => store.setReview(id, r),
   });
@@ -271,4 +273,4 @@ document.addEventListener('click', (e) => {
 window.addEventListener('hashchange', route);
 route();
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('./sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('./sw.js').catch(() => {});
