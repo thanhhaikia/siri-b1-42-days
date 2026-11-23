@@ -1,23 +1,21 @@
 // Browser text-to-speech for word and sentence audio.
 const synth = typeof speechSynthesis !== 'undefined' ? speechSynthesis : null;
-let voice = null;
+const online = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 
+// Best English voice that can play right now: remote voices need a connection.
 function pick() {
-  const vs = synth?.getVoices() || [];
-  voice = vs.find((v) => /en[-_]GB/i.test(v.lang) && /google|natural|female/i.test(v.name))
+  const vs = (synth?.getVoices() || []).filter((v) => /^en/i.test(v.lang) && (v.localService || online()));
+  return vs.find((v) => /en[-_]GB/i.test(v.lang) && /google|natural|female/i.test(v.name))
     || vs.find((v) => /en[-_](GB|US)/i.test(v.lang))
-    || vs.find((v) => /^en/i.test(v.lang)) || null;
-}
-if (synth) {
-  pick();
-  synth.addEventListener?.('voiceschanged', pick);
+    || vs[0] || null;
 }
 
-export const canSpeak = () => !!synth && (synth.getVoices() || []).some((v) => /^en/i.test(v.lang));
+export const canSpeak = () => !!pick();
 
 export function speak(text, rate = 0.9) {
   if (!synth) return;
   synth.cancel();
+  const voice = pick();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = voice?.lang || 'en-GB';
   if (voice) u.voice = voice;
