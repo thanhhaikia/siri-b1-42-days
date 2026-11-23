@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
     private static final String HOME = "https://" + HOST + "/index.html";
     private static final int PICK_FILE = 1;
     private static final int SAVE_FILE = 2;
+    private static final String PENDING_EXPORT = "pendingExport";
     private static final Map<String, String> MIME = Map.of(
             "html", "text/html", "js", "text/javascript", "css", "text/css",
             "json", "application/json", "png", "image/png", "svg", "image/svg+xml");
@@ -74,8 +75,12 @@ public class MainActivity extends Activity {
             ttsReady = tts.setLanguage(Locale.UK) >= TextToSpeech.LANG_AVAILABLE
                     || tts.setLanguage(Locale.US) >= TextToSpeech.LANG_AVAILABLE;
         });
-        if (saved == null) web.loadUrl(HOME);
-        else web.restoreState(saved);
+        if (saved == null) {
+            web.loadUrl(HOME);
+        } else {
+            web.restoreState(saved);
+            pendingExport = saved.getString(PENDING_EXPORT);
+        }
     }
 
     /** Answers requests for the app's own origin from assets/www; anything else goes to the network. */
@@ -143,6 +148,8 @@ public class MainActivity extends Activity {
     protected void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
         web.saveState(out);
+        // Android may recreate the activity while the save dialog is open.
+        out.putString(PENDING_EXPORT, pendingExport);
     }
 
     @Override
