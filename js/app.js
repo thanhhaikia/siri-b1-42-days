@@ -65,6 +65,7 @@ function home() {
     </div>
   </section>`;
   app.querySelector('#exp').onclick = () => {
+    if (globalThis.SiriNative) return SiriNative.exportProgress(store.export());
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([store.export()], { type: 'application/json' }));
     a.download = 'siri-b1-tien-do.json';

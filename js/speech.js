@@ -1,5 +1,7 @@
 // Browser text-to-speech for word and sentence audio.
 const synth = typeof speechSynthesis !== 'undefined' ? speechSynthesis : null;
+// The Android app speaks through the phone's text-to-speech engine: its WebView has no voices.
+const native = globalThis.SiriNative;
 const online = () => typeof navigator === 'undefined' || navigator.onLine !== false;
 
 // Best English voice that can play right now: remote voices need a connection.
@@ -10,9 +12,10 @@ function pick() {
     || vs[0] || null;
 }
 
-export const canSpeak = () => !!pick();
+export const canSpeak = () => (native ? native.canSpeak() : !!pick());
 
 export function speak(text, rate = 0.9) {
+  if (native) return native.speak(text, rate);
   if (!synth) return;
   synth.cancel();
   const voice = pick();

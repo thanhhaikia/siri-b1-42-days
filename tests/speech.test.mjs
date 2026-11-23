@@ -40,3 +40,17 @@ test('speak uses the preferred voice online and a local one offline', () => {
   assert.equal(spoken.at(-1).voice, local);
   assert.equal(spoken.at(-1).lang, 'en-US');
 });
+
+test('inside the Android app speech goes through the native bridge', async () => {
+  const said = [];
+  let ready = false;
+  globalThis.SiriNative = { canSpeak: () => ready, speak: (text, rate) => said.push([text, rate]) };
+  const app = await import('../js/speech.js?android');
+  delete globalThis.SiriNative;
+  voices = [local];
+  assert.equal(app.canSpeak(), false);
+  ready = true;
+  assert.equal(app.canSpeak(), true);
+  app.speak('borrow', 0.8);
+  assert.deepEqual(said, [['borrow', 0.8]]);
+});

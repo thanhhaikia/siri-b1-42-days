@@ -24,3 +24,17 @@ Giọng đọc dùng Web Speech API của trình duyệt, nên cần máy có gi
 ## Deploy
 
 Đẩy lên nhánh `main`: workflow `.github/workflows/pages.yml` chạy test rồi deploy lên GitHub Pages (Settings → Pages → Source: GitHub Actions).
+
+## App Android (APK)
+
+Thư mục `android/` bọc chính trang này trong một WebView; các file web ở gốc repo được chép vào APK lúc build nên app chạy offline hoàn toàn. Cần JDK 17 và Android SDK (`ANDROID_HOME`).
+
+```bash
+cd android
+./gradlew assembleDebug   # app/build/outputs/apk/debug/app-debug.apk
+```
+
+Workflow `.github/workflows/android.yml` cũng build APK này và lưu ở mục Artifacts của mỗi lần chạy.
+
+- Đây là bản debug: cài trực tiếp lên máy được, chưa ký để đưa lên Google Play. APK build ở hai máy khác nhau có chữ ký khác nhau, nên phải gỡ bản cũ trước khi cài bản build từ máy khác (tiến độ nên xuất ra file trước).
+- Trong app, giọng đọc dùng bộ đọc văn bản (Text-to-speech) của điện thoại; xuất/nhập tiến độ dùng trình chọn file của Android.
