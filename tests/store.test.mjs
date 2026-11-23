@@ -1,0 +1,66 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+const mem = new Map();
+globalThis.localStorage = {
+  getItem: (k) => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => mem.set(k, String(v)),
+  removeItem: (k) => mem.delete(k),
+};
+const { store, srsNext, streak, dayNumber, INTERVALS } = await import('../js/store.js');
+
+test('srsNext moves a word up one box when right and back to box 1 when wrong', () => {
+  assert.deepEqual(srsNext({ box: 1, due: 0 }, true, 100), { box: 2, due: 100 + INTERVALS[2] });
+  assert.deepEqual(srsNext({ box: 4, due: 0 }, false, 100), { box: 1, due: 101 });
+  const top = INTERVALS.length - 1;
+  assert.deepEqual(srsNext({ box: top, due: 0 }, true, 100), { box: top, due: 100 + INTERVALS[top] });
+});
+
+test('streak counts consecutive days ending today or yesterday', () => {
+  assert.equal(streak([], 10), 0);
+  assert.equal(streak([8, 9, 10], 10), 3);
+  assert.equal(streak([8, 9], 10), 2);
+  assert.equal(streak([7, 8], 10), 0);
+  assert.equal(streak([5, 9, 10], 10), 2);
+});
+
+test('a grammar day needs vocab, theory and practice; a vocab day skips theory', () => {
+  store.reset();
+  store.setTask(1, 'vocab');
+  store.setTask(1, 'practice');
+  assert.equal(store.dayDone(1, false), false);
+  assert.equal(store.dayDone(1, true), true);
+  store.setTask(1, 'theory');
+  assert.equal(store.dayDone(1, false), true);
+  assert.equal(store.streak(), 1);
+});
+
+test('learned words come due the next day and reviews keep the best score', () => {
+  store.reset();
+  store.learnWords(['u03:0', 'u03:1']);
+  store.learnWords(['u03:0']);
+  assert.equal(store.learnedCount(), 2);
+  assert.deepEqual(store.dueWords(), []);
+  store.state.srs['u03:0'].due = dayNumber();
+  assert.deepEqual(store.dueWords(), ['u03:0']);
+  store.answerWord('u03:0', true);
+  assert.deepEqual(store.dueWords(), []);
+  store.setReview('1-3', { score: 80 });
+  store.setReview('1-3', { score: 60 });
+  assert.equal(store.state.reviews['1-3'].score, 80);
+});
+
+test('export and import round-trip, bad files are rejected', () => {
+  store.reset();
+  store.setTask(2, 'theory');
+  store.learnWords(['u03:5']);
+  const json = store.export();
+  store.reset();
+  assert.equal(store.learnedCount(), 0);
+  store.import(json);
+  assert.equal(store.day(2).theory, true);
+  assert.equal(store.learnedCount(), 1);
+  assert.throws(() => store.import('{"x":1}'));
+  assert.throws(() => store.import('not json'));
+  assert.equal(JSON.parse(mem.get('sirib1.v1')).days[2].theory, true);
+});
