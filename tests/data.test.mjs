@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   CLUSTERS, ALL_WORDS, TOTAL_DAYS, WORDS_PER_DAY, parseQ, parseWord, getDay, reviewsFor,
-  buildReview, findReview, vocabQ, normalize, isCorrect,
+  buildReview, findReview, sameMeaning, vocabQ, normalize, isCorrect,
 } from '../js/data.js';
 
 test('parseQ reads multiple choice and gap lines', () => {
@@ -107,4 +107,22 @@ test('findReview only knows the reviews listed on the schedule', () => {
   assert.equal(findReview('1-21').from, 1);
   assert.equal(findReview('22-42').to, 42);
   for (const id of ['1.5-3', '2-3', '3-1', '1-43', 'abc', '']) assert.equal(findReview(id), undefined, id);
+});
+
+test('vocabulary choices never include another word with the same meaning', () => {
+  const byWord = new Map(ALL_WORDS.map((w) => [w.word, w]));
+  const byVi = new Map(ALL_WORDS.map((w) => [w.vi, w]));
+  const annoy = byWord.get('annoy');
+  const bother = byWord.get('bother');
+  assert.ok(sameMeaning(annoy, bother));
+  assert.ok(!sameMeaning(byWord.get('catch'), byWord.get('miss')));
+  for (const w of ALL_WORDS) {
+    for (const [type, lookup] of [['word', byWord], ['gap', byWord], ['meaning', byVi]]) {
+      const q = vocabQ(w, type);
+      assert.equal(q.o.length, 4);
+      for (const [i, o] of q.o.entries()) {
+        if (i !== q.a) assert.ok(!sameMeaning(w, lookup.get(o)), `${w.word}: ${o}`);
+      }
+    }
+  }
 });

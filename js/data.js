@@ -95,11 +95,20 @@ export function shuffle(arr, rnd = Math.random) {
   return a;
 }
 
+const senses = (w) => w.vi.toLowerCase().replace(/\([^)]*\)/g, '').split(/[,;]/).map((x) => x.trim());
+
+// True when two entries share a Vietnamese meaning, so either would be a right answer.
+export function sameMeaning(a, b) {
+  const sb = senses(b);
+  return senses(a).some((x) => sb.includes(x));
+}
+
 function distractors(w, pool, key, n = 3) {
   const seen = new Set([w[key]]);
   const out = [];
-  const samePos = shuffle(pool.filter((x) => x.pos === w.pos));
-  for (const x of [...samePos, ...shuffle(pool)]) {
+  const usable = pool.filter((x) => !sameMeaning(w, x));
+  const samePos = shuffle(usable.filter((x) => x.pos === w.pos));
+  for (const x of [...samePos, ...shuffle(usable)]) {
     if (out.length === n) break;
     if (!seen.has(x[key])) { seen.add(x[key]); out.push(x[key]); }
   }
