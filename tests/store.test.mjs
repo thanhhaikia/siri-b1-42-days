@@ -128,3 +128,14 @@ test('a storage event delivered after a reset does not bring the deleted progres
   store.setTask(5, 'vocab');
   assert.deepEqual(Object.keys(JSON.parse(mem.get(KEY)).days), ['5']);
 });
+
+test('a word answered in another tab is not moved up a second time', () => {
+  store.reset();
+  store.learnWords(['u03:0']);
+  store.state.srs['u03:0'].due = dayNumber();
+  const other = JSON.parse(store.export());
+  other.srs['u03:0'] = srsNext(other.srs['u03:0'], true, dayNumber());
+  listeners.storage(otherTabSaves(JSON.stringify(other)));
+  store.answerWord('u03:0', true);
+  assert.deepEqual(store.state.srs['u03:0'], { box: 2, due: dayNumber() + INTERVALS[2] });
+});

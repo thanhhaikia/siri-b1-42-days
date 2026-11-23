@@ -77,9 +77,11 @@ export const store = {
     for (const id of ids) if (!state.srs[id]) state.srs[id] = { box: 1, due: today + 1 };
     save();
   },
+  // A word that is no longer due was already answered (e.g. in another tab): keep its schedule.
   answerWord(id, correct) {
-    if (!state.srs[id]) return;
-    state.srs[id] = srsNext(state.srs[id], correct, dayNumber());
+    const today = dayNumber();
+    if (!state.srs[id] || state.srs[id].due > today) return;
+    state.srs[id] = srsNext(state.srs[id], correct, today);
     touch(); save();
   },
   dueWords() {
