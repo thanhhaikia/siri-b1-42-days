@@ -20,7 +20,7 @@ export default {
         { h: "Đại từ bất định", f: "some-/any-/no-/every- + one/body/thing/where",
           p: ["*some-* cho câu khẳng định; *any-* cho câu phủ định và câu hỏi.", "*no-* đi với động từ khẳng định.", "Các đại từ này đi với động từ số ít."],
           e: ["*Someone* has left the lab door open. = Ai đó đã để cửa phòng thí nghiệm mở.", "I didn't discover *anything* new. = Tôi không phát hiện được gì mới.", "*Everybody knows* this app. = Ai cũng biết ứng dụng này."],
-          c: "Is there ___ I can do to help? | something | *anything | nothing | Câu hỏi → any-." },
+          c: "There isn't ___ in the fridge. | something | *anything | nothing | Câu phủ định (isn't) → any-." },
       ],
       qs: [
         "My sister and I have a science blog. ___ write about new gadgets. | Us | *We | Our | Vị trí chủ ngữ → we.",

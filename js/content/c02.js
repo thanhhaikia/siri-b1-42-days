@@ -24,7 +24,7 @@ export default {
       ],
       qs: [
         "I ___ never ___ a foreign language before. | did … learn | *have … learnt | am … learning | Trải nghiệm đến nay với never/before → hiện tại hoàn thành.",
-        "Has the lesson started ___ ? | already | *yet | just | yet đứng cuối câu hỏi và câu phủ định.",
+        "The lesson hasn't started ___. | already | *yet | just | yet đứng cuối câu phủ định và câu hỏi.",
         "We ___ our exam results yesterday. | have got | *got | have been getting | yesterday → quá khứ đơn.",
         "She has taught at this school ___ fifteen years. | since | *for | ago | fifteen years là khoảng thời gian → for.",
         "I've ___ finished the book. It was brilliant! | yet | *just | ever | just = vừa mới, đứng giữa have và V3.",

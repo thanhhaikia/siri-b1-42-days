@@ -52,7 +52,7 @@ export default {
         { h: "Mệnh lệnh và lời đề nghị", f: "told / asked + người + (not) to + V",
           p: ["Mệnh lệnh: *tell someone to do something*.", "Lời nhờ, đề nghị: *ask someone to do something*.", "Phủ định: *not to + V*."],
           e: ["'Sit down.' → The teacher *told us to sit* down. = Cô giáo bảo chúng tôi ngồi xuống.", "'Please help me.' → She *asked me to help* her. = Cô ấy nhờ tôi giúp.", "'Don't touch the paint.' → He *told me not to touch* the paint. = Anh ấy bảo tôi đừng chạm vào sơn."],
-          c: "'Don't be late.' → She told me ___ late. | to not be | *not to be | don't be | not to + V." },
+          c: "'Don't be late.' → She told me ___ late. | to don't be | *not to be | don't be | not to + V." },
       ],
       qs: [
         "'Do you live here?' → He asked me ___ there. | did I live | *if I lived | if did I live | if + S + V lùi thì.",

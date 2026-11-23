@@ -71,7 +71,7 @@ export default {
         "What ___ to your hand? | did happen | *happened | did happened | What là chủ ngữ.",
         "How often ___ you ___ (go) to the gym? Viết hai từ còn thiếu. = do go | do + S + V.",
         "They won't be late, ___ they? = will | Phủ định won't → đuôi will.",
-        "He can swim, ___ he? = can't / cannot | Khẳng định can → đuôi can't.",
+        "He can swim, ___ he? = can't | Khẳng định can → đuôi can't.",
         "Chuyển thành câu gián tiếp: Where is the toilet? → Can you tell me where ___? = the toilet is | Trật tự khẳng định.",
         "She lived in Hue, ___ she? = didn't | Quá khứ đơn khẳng định → didn't.",
         "Who ___ (make) this cake? It's delicious! (quá khứ) = made | Who là chủ ngữ → động từ chia thẳng.",
