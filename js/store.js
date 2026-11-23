@@ -40,6 +40,12 @@ try {
   state = clean(JSON.parse(localStorage.getItem(KEY) || 'null')) || blank();
 } catch { /* no storage: keep progress in memory */ }
 
+// Another tab saved or cleared progress: adopt it so this tab's next save does not overwrite it.
+globalThis.addEventListener?.('storage', (e) => {
+  if (e.key !== null && e.key !== KEY) return;
+  try { state = clean(JSON.parse(e.newValue)) || blank(); } catch { state = blank(); }
+});
+
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* ignore */ }
 }

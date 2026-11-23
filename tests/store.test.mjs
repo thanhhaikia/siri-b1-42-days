@@ -7,6 +7,8 @@ globalThis.localStorage = {
   setItem: (k, v) => mem.set(k, String(v)),
   removeItem: (k) => mem.delete(k),
 };
+const listeners = {};
+globalThis.addEventListener = (type, fn) => { listeners[type] = fn; };
 const { store, srsNext, streak, dayNumber, INTERVALS } = await import('../js/store.js');
 
 test('srsNext moves a word up one box when right and back to box 1 when wrong', () => {
@@ -93,4 +95,19 @@ test('a file with the wrong shape is rejected and leaves progress untouched', ()
 test('a file with only days and srs still imports', () => {
   store.import('{"days":{"2":{"vocab":true}},"srs":{}}');
   assert.deepEqual(store.state, { days: { 2: { vocab: true } }, reviews: {}, srs: {}, dates: [] });
+});
+
+test('progress saved by another tab is adopted instead of overwritten', () => {
+  store.reset();
+  store.setTask(1, 'vocab');
+  const other = JSON.parse(store.export());
+  other.days[2] = { vocab: true };
+  listeners.storage({ key: 'sirib1.v1', newValue: JSON.stringify(other) });
+  store.setTask(3, 'vocab');
+  assert.deepEqual(Object.keys(JSON.parse(globalThis.localStorage.getItem('sirib1.v1')).days), ['1', '2', '3']);
+
+  listeners.storage({ key: 'another.app', newValue: '{}' });
+  assert.equal(Object.keys(store.state.days).length, 3);
+  listeners.storage({ key: 'sirib1.v1', newValue: null });
+  assert.deepEqual(store.state.days, {});
 });
